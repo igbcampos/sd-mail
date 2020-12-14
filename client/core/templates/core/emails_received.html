@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+
+{% block titulo %}Caixa de Entrada{% endblock %}
+
+{% block conteudo %}
+
+    <h1 class="mt-4">Caixa de Entrada</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item active">Caixa de Entrada</li>
+    </ol>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Remetente</th>
+                            <th>Data</th>
+                            <th>Assunto</th>
+                            <th>Mensagem</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Remetente</th>
+                            <th>Data</th>
+                            <th>Assunto</th>
+                            <th>Mensagem</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for email in emails.emails %}
+                            <tr>
+                                <td>{{ email.sender }}</td>
+                                <td>{{ email.created_at }}</td>
+                                <td>{{ email.subject }}</td>
+                                <td>{{ email.body }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
