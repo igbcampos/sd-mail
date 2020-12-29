@@ -6,7 +6,7 @@ Para o propósito de entimento de como os microsserviços funcionam e como as re
 
 ## API
 
-[Acesse a API]()
+[Acesse a API](https://sdmail-api.herokuapp.com/)
 
 ### Setup
 
@@ -55,8 +55,8 @@ flask run
 Para testar a API, foi usado o [Postman](https://www.postman.com/downloads/), outros programas de requição http podem ser usados, respeitando os parâmetros requisitados em cada chamada. Os endpoints a seguir estão disponíveis, a descrição dos cabeçalhos e parâmetros necessários segue cada um deles:
 
 * [http://127.0.0.1:5000/register](http://127.0.0.1:5000/register)
-- Método: POST
-- Body: 
+Método: POST
+Body: 
     raw; 
     JSON;
     {
@@ -66,17 +66,17 @@ Para testar a API, foi usado o [Postman](https://www.postman.com/downloads/), ou
     }
 
 * [http://127.0.0.1:5000/login](http://127.0.0.1:5000/login)
-- Método: GET
-- Authorization: Type: Basic Auth; Username: **email**; Password: **senha**;
+Método: GET
+Authorization: Type: Basic Auth; Username: **email**; Password: **senha**;
 
 * [http://127.0.0.1:5000/me](http://127.0.0.1:5000/me)
-- Método: GET
-- Headers: x-access-tokens: **token**;
+Método: GET
+Headers: x-access-tokens: **token**;
 
 * [http://127.0.0.1:5000/emails](http://127.0.0.1:5000/emails)
-- Método: POST
-- Headers: x-access-tokens: **token**;
-- Body: 
+Método: POST
+Headers: x-access-tokens: **token**;
+Body: 
     raw; 
     JSON; 
     {
@@ -86,16 +86,16 @@ Para testar a API, foi usado o [Postman](https://www.postman.com/downloads/), ou
     }
 
 * [http://127.0.0.1:5000/emails/received](http://127.0.0.1:5000/emails/received)
-- Método: GET
-- Headers: x-access-tokens: **token**;
+Método: GET
+Headers: x-access-tokens: **token**;
 
 * [http://127.0.0.1:5000/emails/sent](http://127.0.0.1:5000/emails/sent)
-- Método: GET
-- Headers: x-access-tokens: **token**;
+Método: GET
+Headers: x-access-tokens: **token**;
 
 ## Cliente
 
-[Acesse o cliente]()
+[Acesse o cliente](https://sdmail.herokuapp.com)
 
 ### Setup
 
@@ -114,6 +114,8 @@ python manage.py runserver
 ```
 
 ### Executando
+
+No cliente é possível criar uma conta, fazer login, consultar os e-mails enviados e os recebidos. É importante destacar só é possível enviar mensagens para usuários já cadastrados no sistema. O sistema já possui dois usuários: igbcampos@mail.com e john@mail.com, ambos com senha **1234**.
 
 Os endpoints a seguir estão disponíveis:
 

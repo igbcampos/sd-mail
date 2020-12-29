@@ -8,4 +8,5 @@ urlpatterns = [
     path('', views.emails_received, name='emails_received'),
     path('send-email', views.send_email, name='send_email'),
     path('sent', views.emails_sent, name='emails_sent'),
+    path('delete', views.delete, name='delete'),
 ]    

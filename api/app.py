@@ -26,8 +26,10 @@ class Email(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now)
     sender = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     receiver = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    subject = db.Column(db.String(256), nullable=False)
     body = db.Column(db.Text)
+    subject = db.Column(db.String(256), nullable=True)
+    sender_deleted_at = db.Column(db.DateTime, nullable=True)
+    receiver_deleted_at = db.Column(db.DateTime, nullable=True)
 
 def token_required(f):
     @wraps(f)
@@ -114,14 +116,18 @@ def get_emails_received(current_user):
     output = []
 
     for email in emails:
-        email_data = {}
-        sender = User.query.filter_by(id=email.sender).first() 
-        email_data['created_at'] = email.created_at
-        email_data['sender'] = sender.email
-        email_data['receiver'] = current_user.email
-        email_data['subject'] = email.subject
-        email_data['body'] = email.body
-        output.append(email_data)
+        if not email.receiver_deleted_at:
+            email_data = {}
+            sender = User.query.filter_by(id=email.sender).first() 
+            email_data['id'] = email.id 
+            email_data['created_at'] = email.created_at
+            email_data['sender'] = sender.email
+            email_data['receiver'] = current_user.email
+            email_data['subject'] = email.subject
+            email_data['body'] = email.body
+            output.append(email_data)
+        
+    db.session.commit()
 
     return jsonify({'emails' : output})
 
@@ -132,13 +138,35 @@ def get_emails_sent(current_user):
     output = []
 
     for email in emails:
-        email_data = {}
-        receiver = User.query.filter_by(id=email.receiver).first() 
-        email_data['created_at'] = email.created_at
-        email_data['sender'] = current_user.email
-        email_data['receiver'] = receiver.email
-        email_data['subject'] = email.subject
-        email_data['body'] = email.body
-        output.append(email_data)
+        if not email.sender_deleted_at:
+            email_data = {}
+            receiver = User.query.filter_by(id=email.receiver).first() 
+            email_data['id'] = email.id 
+            email_data['created_at'] = email.created_at
+            email_data['sender'] = current_user.email
+            email_data['receiver'] = receiver.email
+            email_data['subject'] = email.subject
+            email_data['body'] = email.body
+            output.append(email_data)
 
     return jsonify({'emails' : output})
+
+@app.route('/emails/delete', methods=['DELETE'])
+@token_required
+def delete_email(current_user):
+    id = request.args.get('id')
+    source = request.args.get('source')
+
+    email = Email.query.filter_by(id=id).first()
+
+    if email:
+        if source == 'sender':
+            email.sender_deleted_at = datetime.datetime.now()
+        else:
+            email.receiver_deleted_at = datetime.datetime.now()
+        
+        db.session.commit()
+
+        return jsonify({'message': 'email successfully deleted'})
+    else:
+        return jsonify({'message': 'it was not possible to delete the email'})

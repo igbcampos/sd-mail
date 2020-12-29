@@ -6,7 +6,7 @@ import requests
 
 def token_valido(request):
     auth_token = request.session.get('auth_token')
-    response = requests.get('http://127.0.0.1:5000/me', headers={"x-access-tokens": auth_token})
+    response = requests.get('https://sdmail-api.herokuapp.com/me', headers={"x-access-tokens": auth_token})
 
     if 'message' in response.json().keys() and response.json()['message'] == 'token is invalid':
         return False
@@ -33,12 +33,12 @@ class Login(View):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        response = requests.post('http://127.0.0.1:5000/login', auth=(email, password))
+        response = requests.post('https://sdmail-api.herokuapp.com/login', auth=(email, password))
 
         if response.status_code == 200:
             request.session['auth_token'] = response.json()['token']
 
-            response = requests.get('http://127.0.0.1:5000/me', headers={"x-access-tokens": response.json()['token']})
+            response = requests.get('https://sdmail-api.herokuapp.com/me', headers={"x-access-tokens": response.json()['token']})
 
             request.session['name'] = response.json()['name']
             request.session['email'] = response.json()['email']
@@ -62,7 +62,7 @@ class Register(View):
             'password':  request.POST.get('password'),
         }
         
-        response = requests.post('http://127.0.0.1:5000/register', json=contexto)
+        response = requests.post('https://sdmail-api.herokuapp.com/register', json=contexto)
         response = response.json()
 
         if response['message'] == 'registered successfully':
@@ -87,7 +87,7 @@ def emails_received(request):
     user = is_authenticated(request)
 
     if user['auth_token'] and token_valido(request):
-        response = requests.get('http://127.0.0.1:5000/emails/received', headers={"x-access-tokens": user['auth_token']})
+        response = requests.get('https://sdmail-api.herokuapp.com/emails/received', headers={"x-access-tokens": user['auth_token']})
         
         return render(request, 'core/emails_received.html', {'user': user, 'emails': response.json()})
     else:
@@ -103,7 +103,7 @@ def send_email(request):
             "body": request.POST.get('body')
         }
 
-        response = requests.post('http://127.0.0.1:5000/emails', json=email, headers={"x-access-tokens": user['auth_token']})
+        response = requests.post('https://sdmail-api.herokuapp.com/emails', json=email, headers={"x-access-tokens": user['auth_token']})
         response = response.json()
     
         if response['message'] == 'receiver not found':
@@ -121,11 +121,30 @@ def emails_sent(request):
     user = is_authenticated(request)
 
     if user['auth_token'] and token_valido(request):
-        response = requests.get('http://127.0.0.1:5000/emails/sent', headers={"x-access-tokens": user['auth_token']})
+        response = requests.get('https://sdmail-api.herokuapp.com/emails/sent', headers={"x-access-tokens": user['auth_token']})
 
         print(response.json())
 
         return render(request, 'core/emails_sent.html', {'user': user, 'emails': response.json()})
+    else:
+        return redirect('/login')
+
+def delete(request):
+    user = is_authenticated(request)
+    id = request.GET.get('id')
+    source = request.GET.get('source')
+
+    if user['auth_token'] and token_valido(request):
+        response = requests.delete('https://sdmail-api.herokuapp.com/emails/delete?id={}&source={}'.format(id, source), headers={"x-access-tokens": user['auth_token']})
+        
+        response = response.json()
+
+        if response['message'] == 'email successfully deleted':
+            messages.success(request, 'E-mail deletado com sucesso.')
+        else:
+            messages.error(request, 'O e-mail não foi deletado. Por favor, tente novamente')
+
+        return redirect('/')
     else:
         return redirect('/login')
     
