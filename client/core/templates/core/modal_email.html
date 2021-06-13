@@ -21,12 +21,12 @@
     let repliesJson = JSON.parse(replies.replaceAll("\u0027", '"'))
     let renderedReply = repliesJson.map(reply=>renderReplies(reply)).toString().replaceAll(",","")
     let actions = `<div id="receiver-input-${id}" class="form-group" hidden>`+
-                    '<label class="small mb-1" for="receiver">Destinatário</label>'+
-                    '<input class="form-control" id="receiver" name="receiver" type="email" placeholder="Destinatário"/>'+
+                    `<label class="small mb-1" for="receiver-${id}">Destinatário</label>`+
+                    `<input class="form-control" id="receiver-${id}" name="receiver" type="email" placeholder="Destinatário"/>`+
                   '</div>'+
                   `<div id="body-input-${id}" class="form-group" hidden>`+
-                    '<label for="body" class="small mb-1">Mensagem</label>'+
-                    '<textarea class="form-control" name="body" id="body" rows="4" placeholder="Mensagem"></textarea>'+
+                    `<label for="body-${id}" class="small mb-1">Mensagem</label>`+
+                    `<textarea class="form-control" name="body" id="body-${id}" rows="4" placeholder="Mensagem"></textarea>`+
                   '</div>'+
                   `<input name="email_id" value="${id}" hidden>`+
                   `<button id="submit-${id}" type="submit" class="btn btn-primary mb-3" hidden>Enviar</button>`+
@@ -44,12 +44,12 @@
           `<h6 class="card-subtitle mb-2 text-muted">${reply.subject}</h6>`+
           `<p class="card-text">${reply.body}</p>`+
             `<div id="receiver-input-${reply.id}" class="form-group" hidden>`+
-              '<label class="small mb-1" for="receiver-reply">Destinatário</label>'+
-              '<input class="form-control" id="receiver-reply" name="receiver" type="email" placeholder="Destinatário"/>'+
+              `<label class="small mb-1" for="receiver-reply-${reply.id}">Destinatário</label>`+
+              `<input class="form-control" id="receiver-reply-${reply.id}" name="receiver" type="email" placeholder="Destinatário"/>`+
             '</div>'+
             `<div id="body-input-${reply.id}" class="form-group" hidden>`+
-              '<label for="body-reply" class="small mb-1">Mensagem</label>'+
-              '<textarea class="form-control" name="body" id="body-reply" rows="4" placeholder="Mensagem"></textarea>'+
+              `<label for="body-reply-${reply.id}" class="small mb-1">Mensagem</label>`+
+              `<textarea class="form-control" name="body" id="body-reply-${reply.id}" rows="4" placeholder="Mensagem"></textarea>`+
             '</div>'+
             `<input name="email_id" value="${reply.id}" hidden>`+
             `<button id="submit-${reply.id}" type="submit" class="btn btn-primary" hidden>Enviar</button>`+
