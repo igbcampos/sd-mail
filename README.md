@@ -6,8 +6,6 @@ Para o propósito de entimento de como os microsserviços funcionam e como as re
 
 ## API
 
-[Acesse a API](https://sdmail-api.herokuapp.com/)
-
 ### Setup
 
 Para a execução correta da API é necessário: criar o ambiente virtual, instalar o sqlite3, criar as tabelas no banco de dados e iniciar a execução do servidor. Os seguintes passos tratam de cada uma dessas etapas, respectivamente:
@@ -93,6 +91,28 @@ Headers: x-access-tokens: **token**;
 Método: GET
 Headers: x-access-tokens: **token**;
 
+* [http://127.0.0.1:5000/emails/forward](http://127.0.0.1:5000/emails/forward)
+Método: POST
+Headers: x-access-tokens: **token**;
+Body: 
+    raw; 
+    JSON; 
+    {
+        "receiver": "john@mail.com",
+        "email_id": 1
+    }
+
+* [http://127.0.0.1:5000/emails/reply](http://127.0.0.1:5000/emails/reply)
+Método: POST
+Headers: x-access-tokens: **token**;
+Body: 
+    raw; 
+    JSON; 
+    {
+        "email_id": 1,
+        "body": "Teste"
+    }
+
 ## Cliente
 
 [Acesse o cliente](https://sdmail.herokuapp.com)
@@ -110,6 +130,7 @@ python -m venv env
 env\Scripts\activate
 pip install -r requirements.txt
 python manage.py migrate
+set BASE_URL=http://127.0.0.1:5000
 python manage.py runserver
 ```
 

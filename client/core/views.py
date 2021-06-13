@@ -3,10 +3,13 @@ from django.views import View
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
 import requests
+import os
+
+base_url = os.environ.get('BASE_URL')
 
 def token_valido(request):
     auth_token = request.session.get('auth_token')
-    response = requests.get('https://sdmail-api.herokuapp.com/me', headers={"x-access-tokens": auth_token})
+    response = requests.get(base_url+'/me', headers={"x-access-tokens": auth_token})
 
     if 'message' in response.json().keys() and response.json()['message'] == 'token is invalid':
         return False
@@ -24,6 +27,7 @@ def is_authenticated(request):
 
 class Login(View):
     def get(self, request):
+        print(base_url)
         if is_authenticated(request)['auth_token']:
             return redirect('/')
         else:
@@ -33,12 +37,12 @@ class Login(View):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        response = requests.post('https://sdmail-api.herokuapp.com/login', auth=(email, password))
+        response = requests.post(base_url+'/login', auth=(email, password))
 
         if response.status_code == 200:
             request.session['auth_token'] = response.json()['token']
 
-            response = requests.get('https://sdmail-api.herokuapp.com/me', headers={"x-access-tokens": response.json()['token']})
+            response = requests.get(base_url+'/me', headers={"x-access-tokens": response.json()['token']})
 
             request.session['name'] = response.json()['name']
             request.session['email'] = response.json()['email']
@@ -62,7 +66,7 @@ class Register(View):
             'password':  request.POST.get('password'),
         }
         
-        response = requests.post('https://sdmail-api.herokuapp.com/register', json=contexto)
+        response = requests.post(base_url+'/register', json=contexto)
         response = response.json()
 
         if response['message'] == 'registered successfully':
@@ -87,7 +91,7 @@ def emails_received(request):
     user = is_authenticated(request)
 
     if user['auth_token'] and token_valido(request):
-        response = requests.get('https://sdmail-api.herokuapp.com/emails/received', headers={"x-access-tokens": user['auth_token']})
+        response = requests.get(base_url+'/emails/received', headers={"x-access-tokens": user['auth_token']})
         
         return render(request, 'core/emails_received.html', {'user': user, 'emails': response.json()})
     else:
@@ -103,7 +107,7 @@ def send_email(request):
             "body": request.POST.get('body')
         }
 
-        response = requests.post('https://sdmail-api.herokuapp.com/emails', json=email, headers={"x-access-tokens": user['auth_token']})
+        response = requests.post(base_url+'/emails', json=email, headers={"x-access-tokens": user['auth_token']})
         response = response.json()
     
         if response['message'] == 'receiver not found':
@@ -121,7 +125,7 @@ def emails_sent(request):
     user = is_authenticated(request)
 
     if user['auth_token'] and token_valido(request):
-        response = requests.get('https://sdmail-api.herokuapp.com/emails/sent', headers={"x-access-tokens": user['auth_token']})
+        response = requests.get(base_url+'/emails/sent', headers={"x-access-tokens": user['auth_token']})
 
         print(response.json())
 
@@ -135,7 +139,7 @@ def delete(request):
     source = request.GET.get('source')
 
     if user['auth_token'] and token_valido(request):
-        response = requests.delete('https://sdmail-api.herokuapp.com/emails/delete?id={}&source={}'.format(id, source), headers={"x-access-tokens": user['auth_token']})
+        response = requests.delete(base_url+'/emails/delete?id={}&source={}'.format(id, source), headers={"x-access-tokens": user['auth_token']})
         
         response = response.json()
 
@@ -148,3 +152,48 @@ def delete(request):
     else:
         return redirect('/login')
     
+def reply_email(request):
+    user = is_authenticated(request)
+
+    if user['auth_token'] and token_valido(request):
+        email = {
+            "email_id": request.POST.get('email_id'), 
+            "body": request.POST.get('body')
+        }
+
+        response = requests.post(base_url+'/emails/reply', json=email, headers={"x-access-tokens": user['auth_token']})
+        response = response.json()
+    
+        if response['message'] == 'email not found':
+            messages.error(request, 'E-mail não encontrado.')
+        elif response['message'] == 'email replied':
+            messages.success(request, 'E-mail respondido com sucesso.')
+        else:
+            messages.error(request, 'O e-mail não foi respondido. Por favor, tente novamente.')
+
+        return redirect('/')
+    else:
+        return redirect('/login')
+
+def forward_email(request):
+    user = is_authenticated(request)
+
+    if user['auth_token'] and token_valido(request):
+        email = {
+            "receiver": request.POST.get('receiver'), 
+            "email_id": request.POST.get('email_id')
+        }
+
+        response = requests.post(base_url+'/emails/forward', json=email, headers={"x-access-tokens": user['auth_token']})
+        response = response.json()
+    
+        if response['message'] == 'receiver not found':
+            messages.error(request, 'Destinatário não encontrado.')
+        elif response['message'] == 'email forwarded':
+            messages.success(request, 'E-mail encaminhado com sucesso.')
+        else:
+            messages.error(request, 'O e-mail não foi encaminhado. Por favor, tente novamente.')
+
+        return redirect('/')
+    else:
+        return redirect('/login')

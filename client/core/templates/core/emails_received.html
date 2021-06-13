@@ -38,6 +38,7 @@
                                 <td>{{ email.subject }}</td>
                                 <td>{{ email.body }}</td>
                                 <td>
+                                    <button type="button" data-toggle="modal" data-target="#exampleModalCenter" class="btn btn-primary" onclick="fillModal('Destinatário', '{{ email.receiver }}', '{{ email.name }}', '{{ email.subject }}', '{{ email.body }}', '{{ email.id }}', '{{ email.created_at }}', '{{ email.replies|escapejs }}')">Visualizar</button>
                                     <a class="btn btn-danger" href="/delete?id={{ email.id }}&source=receiver">Deletar</a>
                                 </td>
                             </tr>

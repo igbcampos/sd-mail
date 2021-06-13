@@ -9,4 +9,6 @@ urlpatterns = [
     path('send-email', views.send_email, name='send_email'),
     path('sent', views.emails_sent, name='emails_sent'),
     path('delete', views.delete, name='delete'),
+    path('reply', views.reply_email, name='reply'),
+    path('forward', views.forward_email, name='forward'),
 ]    

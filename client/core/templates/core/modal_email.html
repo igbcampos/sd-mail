@@ -1,35 +1,62 @@
-<div class="modal fade" id="modal-grande" tabindex="-1" role="dialog" aria-labelledby="modal-grande" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <form action="{% url 'send_email' %}" method="POST" id="formulario-modal-grande">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="titulo-modal-grande">Enviar E-mail</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="corpo-modal-grande">
-                    <div class="form-group">
-                        <label class="small mb-1" for="receiver">Destinatário</label>
-                        <input class="form-control" id="receiver" name="receiver" type="email" placeholder="Destinatário" required/>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="small mb-1" for="subject">Assunto</label>
-                        <input type="text" id="subject" name="subject" class="form-control" placeholder="Assunto" required/>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="body">Mensagem</label>
-                        <textarea class="form-control" name="body" id="body" rows="4" placeholder="Mensagem" required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Enviar</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                </div>
-            </form>
-        </div>
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Visualizar E-mail</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+      </div>
     </div>
+  </div>
 </div>
+<script>
+  function fillModal(source, email, name, subject, body, id, created_at, replies){
+    let modalBody = document.getElementById("exampleModalCenter").getElementsByClassName("modal-body")[0]
+    let repliesJson = JSON.parse(replies.replaceAll("\u0027", '"'))
+    let renderedReply = repliesJson.map(reply=>renderReplies(reply)).toString().replaceAll(",","")
+    let actions = `<div id="receiver-input-${id}" class="form-group" hidden>`+
+                    '<label class="small mb-1" for="receiver">Destinatário</label>'+
+                    '<input class="form-control" id="receiver" name="receiver" type="email" placeholder="Destinatário"/>'+
+                  '</div>'+
+                  `<div id="body-input-${id}" class="form-group" hidden>`+
+                    '<label for="body" class="small mb-1">Mensagem</label>'+
+                    '<textarea class="form-control" name="body" id="body" rows="4" placeholder="Mensagem"></textarea>'+
+                  '</div>'+
+                  `<input name="email_id" value="${id}" hidden>`+
+                  `<button id="submit-${id}" type="submit" class="btn btn-primary mb-3" hidden>Enviar</button>`+
+                  `<a href="#" class="card-link" onclick="document.getElementById('reply-${id}').action='/forward';document.getElementById('receiver-input-${id}').hidden=false; document.getElementById('submit-${id}').hidden=false; document.getElementById('body-input-${id}').hidden=true" >Encaminhar</a>`+
+                  `<a href="#" class="card-link" onclick="document.getElementById('reply-${id}').action='/reply';document.getElementById('body-input-${id}').hidden=false; document.getElementById('submit-${id}').hidden=false; document.getElementById('receiver-input-${id}').hidden=true" >Responder</a>`
+        
+    modalBody.innerHTML = `<form id="reply-${id}" method="post">{% csrf_token %}<div><p>${source}: ${name} - <a href="mailto:${email}">${email}</a></p> <p>Data de envio: ${created_at}</p><p>Assunto: ${subject}</p><p>Mensagem: ${body}</p>${actions}${renderedReply}</div></form>`
+  }
+  function renderReplies(reply){
+    return '<div class="card mb-3">'+
+      `<form id="reply-${reply.id}" method="post">`+
+        `{% csrf_token %}`+
+        '<div class="card-body">'+
+          `<h5 class="card-title">${reply.sender}</h5>`+
+          `<h6 class="card-subtitle mb-2 text-muted">${reply.subject}</h6>`+
+          `<p class="card-text">${reply.body}</p>`+
+            `<div id="receiver-input-${reply.id}" class="form-group" hidden>`+
+              '<label class="small mb-1" for="receiver-reply">Destinatário</label>'+
+              '<input class="form-control" id="receiver-reply" name="receiver" type="email" placeholder="Destinatário"/>'+
+            '</div>'+
+            `<div id="body-input-${reply.id}" class="form-group" hidden>`+
+              '<label for="body-reply" class="small mb-1">Mensagem</label>'+
+              '<textarea class="form-control" name="body" id="body-reply" rows="4" placeholder="Mensagem"></textarea>'+
+            '</div>'+
+            `<input name="email_id" value="${reply.id}" hidden>`+
+            `<button id="submit-${reply.id}" type="submit" class="btn btn-primary" hidden>Enviar</button>`+
+          `<a href="#" class="card-link" onclick="document.getElementById('reply-${reply.id}').action='/forward';document.getElementById('receiver-input-${reply.id}').hidden=false; document.getElementById('submit-${reply.id}').hidden=false; document.getElementById('body-input-${reply.id}').hidden=true" >Encaminhar</a>`+
+          `<a href="#" class="card-link" onclick="document.getElementById('reply-${reply.id}').action='/reply';document.getElementById('body-input-${reply.id}').hidden=false; document.getElementById('submit-${reply.id}').hidden=false; document.getElementById('receiver-input-${reply.id}').hidden=true" >Responder</a>`+
+        '</div>'+
+      '</form>'+
+    '</div>'
+  }
+</script>
