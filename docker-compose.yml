@@ -1,0 +1,22 @@
+version: "3.9"
+   
+services:
+  api:
+    build: .
+    environment:
+      - FLASK_APP=api/app.py
+      - FLASK_ENV=development
+    command: bash -c "flask run --host=0.0.0.0 --port=5000"
+    volumes:
+      - .:/code
+    ports:
+      - "5000:5000"
+  web:
+    build: .
+    environment:
+      - BASE_URL=http://exec04_api_1:5000
+    command: bash -c "python client/manage.py migrate && python client/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"

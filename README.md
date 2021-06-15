@@ -1,54 +1,16 @@
 # Microsserviços
 
-Conforme solicitado pelo professor, foi desenvolvido uma API e um cliente de e-mail. Ambos foram feitos usando a linguagem python, sendo que a primeira faz uso da micro framework Flask, enquanto o sendo usa a biblioteca Django. Toda a autenticação e o armazenamento e manipulação é enviado pelo cliente e feito na api, e essas informações são trocadas usando o formato JSON. 
+O projeto realizado trata-se de uma implementação de um serviço de mensagens, onde foi desenvolvido uma API e um cliente de e-mail. Implementados na linguagem Python, a API faz uso da micro framework Flask e o Cliente utiliza a biblioteca Django. A autenticação, armazenamento e manipulação é enviado pelo Cliente e feito na API, tal como essas informações são trocadas usando o formato JSON. 
 
-Para o propósito de entimento de como os microsserviços funcionam e como as requisições são tratadas internamente, foi pedido também, que fosse usado ferramentas de baixo nível. O Flask me pareceu uma boa escolha. Espero que, pelo amor de Deus, não haja problema.
+Além disso, no desenvolvimento do servidor de email utilizou-se WebServices no modelo REST, onde foi implementado as seguintes funcionalidades: enviar, listar, apagar, abrir, encaminhar e responder mensagens.
+
+## Execução
+
+Para executar as aplicações faz-se necessário ter o Docker instalado. Para iniciar a execução basta clicar para executar o script **start.cmd** que se encontra na raíz do projeto.
 
 ## API
 
-### Setup
-
-Para a execução correta da API é necessário: criar o ambiente virtual, instalar o sqlite3, criar as tabelas no banco de dados e iniciar a execução do servidor. Os seguintes passos tratam de cada uma dessas etapas, respectivamente:
-
-#### Criar ambiente Virtual
-
-No terminal, no diretório api, digite os seguintes comandos:
-
-```
-python -m venv env
-env\Scripts\activate
-pip install -r requirements.txt
-```
-
-#### Instalar sqlite3
-
-1. Baixar o [sqlite3](https://sqlite.org/download.html), na opção Precompiled Binaries for Windows > sqlite-tools-win32-x86-3340000.zip
-
-2. Criar a pasta **sqlite3** em **C:** e colar os arquivos extraídos do download feito no passo 1 (sqldiff, sqlite3 e sqlite3_analyzer).
-
-2. Adicionar a pasta **C:\sqlite3** ao **path** do Windows.
-
-#### Criar tabelas e iniciar servidor
-
-No terminal, no diretório api, digite os seguintes comandos:
-
-```
-sqlite3 database.db
-^C
-
-python
-
-from app import db
-db.create_all()
-
-exit()
-
-set FLASK_APP=app.py
-set FLASK_ENV=development
-flask run
-```
-
-### Executando
+### Endpoints
 
 Para testar a API, foi usado o [Postman](https://www.postman.com/downloads/), outros programas de requição http podem ser usados, respeitando os parâmetros requisitados em cada chamada. Os endpoints a seguir estão disponíveis, a descrição dos cabeçalhos e parâmetros necessários segue cada um deles:
 
@@ -115,28 +77,9 @@ Body:
 
 ## Cliente
 
-[Acesse o cliente](https://sdmail.herokuapp.com)
+### Endpoints
 
-### Setup
-
-Para a execução correta do cliente é necessário: criar o ambiente virtual, criar as tabelas no banco de dados e iniciar a execução do servidor. Os seguintes passos tratam de cada uma dessas etapas, respectivamente:
-
-#### Criar ambiente Virtual, criar tabelas e iniciar servidor
-
-No terminal, no diretório client, digite os seguintes comandos:
-
-```
-python -m venv env
-env\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-set BASE_URL=http://127.0.0.1:5000
-python manage.py runserver
-```
-
-### Executando
-
-No cliente é possível criar uma conta, fazer login, consultar os e-mails enviados e os recebidos. É importante destacar só é possível enviar mensagens para usuários já cadastrados no sistema. O sistema já possui dois usuários: igbcampos@mail.com e john@mail.com, ambos com senha **1234**.
+No cliente é possível criar uma conta, fazer login, consultar os e-mails enviados e os recebidos, responder e encaminhar. O sistema já possui dois usuários: maria@maria.com e jane@mail.com, ambos com senha **1234**. O sistema só permite o envio de mensagens para usuários cadastrados.
 
 Os endpoints a seguir estão disponíveis:
 
